@@ -1,0 +1,8 @@
+{:paths ["src"]
+ :deps
+ {com.datomic/datomic-free {:mvn/version "0.9.5697"}
+  io.pedestal/pedestal.log {:mvn/version "0.5.3"}
+  org.clojure/core.async {:mvn/version "0.4.474"}}
+ :aliases
+ {:test {:extra-paths ["test"]}
+  :check {:extra-deps {org.clojure/test.check {:mvn/version "0.9.0"}}}}}
