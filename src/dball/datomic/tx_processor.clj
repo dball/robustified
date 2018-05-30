@@ -5,6 +5,10 @@
   (:import [java.time Duration]
            [java.util.concurrent BlockingQueue TimeUnit]))
 
+;; 1. reasons txn application txn duplicate id
+;; 2. don't throw
+;; 3. timeout: resubmit? derive uuid? write to durable queue
+;; 4. pass in control
 (defn build-txn-submitter
   "Spawns a thread that consumes request maps from the txns channel,
    attempting to apply the :txn to the conn. If a txn fails to apply,
@@ -45,6 +49,7 @@
   [reqs txn]
   (async/>!! reqs {:txn txn}))
 
+;; Tim has weird feels
 (defn transact!
   "Submits the txn for application and returns the txr if the txn was verifiably
    applied or nil if it was not accepted. If it was accepted but not verifiably
@@ -85,6 +90,11 @@
          :db-before (d/as-of db (dec t))
          :db-after (d/as-of db t)}))))
 
+;; consider using offer! instead of onto-chan
+;; add top-level try-catch in each async/thread
+;; add debug logs
+;; spinlock until you've caught up
+;; basis-t -> next-t
 (defn build-tx-report-consumer
   "Spawns a thread that consumes the transaction report queue and writes
    the reports to the txrs channel, polling at the given interval. When
@@ -115,6 +125,7 @@
               (when (some? (async/>!! txrs txr))
                 (recur)))))))))
 
+;; uml blocks with channels (buffer, etc.) and data structures
 (defn build-tx-report-processor
   "Spawns a thread that processes transaction reports from the txrs channel
    by applying them to the process fn. If it completes without error, this

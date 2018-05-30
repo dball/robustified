@@ -110,3 +110,12 @@
 ;; 2. for each txr, the db-before is equivalent to the db-after of the preceding
 ;;    txr, if any
 ;; 3. for each txr, the applying the tx-data to the db-before yields the db-after
+
+;; Test plan:
+;; 1. create database
+;; 2. generate and apply schema with x attributes
+;; 3. generate y txns with z datoms
+;; 4. choose consumer attach point before the final txn
+;; 5. walk the timeline, applying the txns and attaching the consumer
+;; 6. shut down the machine
+;; 7. assert the properties
